@@ -181,7 +181,7 @@ def plot_scale_factor_vs_look_back_time(tlb,a,args=None):
 	plt.style.use('robertsons_rules')
 
 	#expansion history
-	ax[0].plot(tlb,a)
+#	ax[0].plot(tlb,a)
 	ax[0].plot(tldcp,a,label=fr'{argsdcp.name}: $w_0$={argsdcp.w0:4.3f}, $w_a$={argsdcp.wa:4.3f}')
 	ax[0].plot(tldcu,a,label=fr'{argsdcu.name}: $w_0$={argsdcu.w0:4.3f}, $w_a$={argsdcu.wa:4.3f}')
 	ax[0].plot(tldcd,a,label=fr'{argsdcd.name}: $w_0$={argsdcd.w0:4.3f}, $w_a$={argsdcd.wa:4.3f}')
