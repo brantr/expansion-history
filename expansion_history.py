@@ -25,8 +25,8 @@ def create_parser():
 
     parser.add_argument('--Omega_r',
         dest='Omega_r',
-#        default=4.203069657615112e-05,
-        default=0,
+        default=4.203069657615112e-05,
+        #default=0,
         type=float,
         help='Radiation overdensity Omega_r h**2.')
 
@@ -254,8 +254,8 @@ def special_cosmologies(argsin):
 		argsin.name = 'Concordance'
 		argsin.Omega_m = 0.3
 		argsin.H0 = 70.
-		#argsin.Omega_r = 4.203069657615112e-05
-		argsin.Omega_r = 0
+		argsin.Omega_r = 4.203069657615112e-05
+		#argsin.Omega_r = 0
 		argsin.Omega_de = None #set later
 		argsin.w0 = -1
 		argsin.wa = 0
@@ -263,7 +263,7 @@ def special_cosmologies(argsin):
 		argsin.name = 'DESI+CMB+Pantheon'
 		argsin.Omega_m = 0.3085
 		argsin.H0 = 68.03
-		argsin.Omega_r = 0#4.203069657615112e-05
+		argsin.Omega_r = 4.203069657615112e-05
 		argsin.Omega_de = None #set later
 		argsin.w0 = -0.827
 		argsin.wa = -0.75
