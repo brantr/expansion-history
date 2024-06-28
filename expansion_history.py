@@ -25,7 +25,8 @@ def create_parser():
 
     parser.add_argument('--Omega_r',
         dest='Omega_r',
-        default=4.203069657615112e-05,
+#        default=4.203069657615112e-05,
+        default=0,
         type=float,
         help='Radiation overdensity Omega_r h**2.')
 
@@ -136,13 +137,14 @@ def plot_scale_factor_vs_look_back_time(tlb,a,args=None):
 	argsdcp  = argslcdm.copy()#parser.parse_args()
 	argsdcu  = argslcdm.copy()
 	argsdcd  = argslcdm.copy()
-	H0_inv = 1./H0_in_inv_gyr()
+
 
 	#concordance
 	argslcdm.Concordance = True
 	argslcdm = special_cosmologies(argslcdm)
 	argslcdm = adjust_omegas(argslcdm)
 	tllcdm = t(z,args=argslcdm)
+	H0_inv = 1./H0_in_inv_gyr(args=argslcdm)
 	tllcdm/=H0_inv #H0 t
 
 
@@ -151,6 +153,7 @@ def plot_scale_factor_vs_look_back_time(tlb,a,args=None):
 	argsdcp = special_cosmologies(argsdcp)
 	argsdcp = adjust_omegas(argsdcp)
 	tldcp = t(z,args=argsdcp)
+	H0_inv = 1./H0_in_inv_gyr(args=argsdcp)
 	tldcp/=H0_inv #H0 t
 
 	#DESI+CMB+Union3
@@ -158,6 +161,7 @@ def plot_scale_factor_vs_look_back_time(tlb,a,args=None):
 	argsdcu = special_cosmologies(argsdcu)
 	argsdcu = adjust_omegas(argsdcu)
 	tldcu = t(z,args=argsdcu)
+	H0_inv = 1./H0_in_inv_gyr(args=argsdcu)
 	tldcu/=H0_inv #H0 t
 
 	#DESI+CMB+DESY5
@@ -165,6 +169,7 @@ def plot_scale_factor_vs_look_back_time(tlb,a,args=None):
 	argsdcd = special_cosmologies(argsdcd)
 	argsdcd = adjust_omegas(argsdcd)
 	tldcd = t(z,args=argsdcd)
+	H0_inv = 1./H0_in_inv_gyr(args=argsdcd)
 	tldcd/=H0_inv #H0 t
 
 	print_cosmology(argslcdm)
@@ -181,7 +186,6 @@ def plot_scale_factor_vs_look_back_time(tlb,a,args=None):
 	plt.style.use('robertsons_rules')
 
 	#expansion history
-#	ax[0].plot(tlb,a)
 	ax[0].plot(tldcp,a,label=fr'{argsdcp.name}: $w_0$={argsdcp.w0:4.3f}, $w_a$={argsdcp.wa:4.3f}')
 	ax[0].plot(tldcu,a,label=fr'{argsdcu.name}: $w_0$={argsdcu.w0:4.3f}, $w_a$={argsdcu.wa:4.3f}')
 	ax[0].plot(tldcd,a,label=fr'{argsdcd.name}: $w_0$={argsdcd.w0:4.3f}, $w_a$={argsdcd.wa:4.3f}')
@@ -201,7 +205,7 @@ def plot_scale_factor_vs_look_back_time(tlb,a,args=None):
 	ax[1].plot(tldcd,(a/a_tldcd_lcdm),label=fr'{argsdcd.name}: $w_0$={argsdcd.w0:4.3f}, $w_a$={argsdcd.wa:4.3f}')
 	ax[1].plot(tllcdm,(a/a),label='LCDM',linestyle=':')
 	ax[1].set_xlim([0.8,0])
-	ax[1].set_ylim([0.995,1.075])
+	ax[1].set_ylim([0.90,1.01])
 	ax[1].set_xlabel(r'Look-back time $H_0 t$')
 	ax[1].set_ylabel(r'Scale factor $a$ / Scale factor $a_\Lambda(H_0t)$')
 	ax[1].legend(frameon=False)
@@ -250,7 +254,8 @@ def special_cosmologies(argsin):
 		argsin.name = 'Concordance'
 		argsin.Omega_m = 0.3
 		argsin.H0 = 70.
-		argsin.Omega_r = 4.203069657615112e-05
+		#argsin.Omega_r = 4.203069657615112e-05
+		argsin.Omega_r = 0
 		argsin.Omega_de = None #set later
 		argsin.w0 = -1
 		argsin.wa = 0
@@ -258,7 +263,7 @@ def special_cosmologies(argsin):
 		argsin.name = 'DESI+CMB+Pantheon'
 		argsin.Omega_m = 0.3085
 		argsin.H0 = 68.03
-		argsin.Omega_r = 4.203069657615112e-05
+		argsin.Omega_r = 0#4.203069657615112e-05
 		argsin.Omega_de = None #set later
 		argsin.w0 = -0.827
 		argsin.wa = -0.75
@@ -451,6 +456,8 @@ def H0_in_inv_gyr(args=None):
 	else:
 		H0      = 70 #km/s/Mpc
 
+	print(f'H0 = {H0}')
+
 	#conver Mpc * s / km to Gyr
 	mpc_in_km = 3.26156 * 1.0e6 * 31536000 * 2.99792458e5
 	gyr_per_s = 1./(1.0e9 * 31536000)
@@ -482,10 +489,10 @@ def main():
 
     #print cosmology
     if(args.verbose):
-    	print_reference_histories()
+    	#print_reference_histories()
     	print_cosmology(args)
 
-    H0_inv = 1./H0_in_inv_gyr()
+    H0_inv = 1./H0_in_inv_gyr(args=args)
     print(f'1/H0 in gyr = {H0_inv}.')
 
     z = 0.01
@@ -505,11 +512,67 @@ def main():
     print(f'Time to redshift z = {z} is t = {tl} Gyr.')
 
 
+    z = 2.0
+    tl = t(z,args=args)
+    print(f'Time to redshift z = {z} is H0t = {tl/H0_inv} Gyr.')
+    z = 4.
+    tl = t(z,args=args)
+    print(f'Time to redshift z = {z} is H0t = {tl/H0_inv} Gyr.')
+    z = 6.
+    tl = t(z,args=args)
+    print(f'Time to redshift z = {z} is H0t = {tl/H0_inv} Gyr.')
+    z = 8.
+    tl = t(z,args=args)
+    print(f'Time to redshift z = {z} is H0t = {tl/H0_inv} Gyr.')
+    z = 10.
+    tl = t(z,args=args)
+    print(f'Time to redshift z = {z} is H0t = {tl/H0_inv} Gyr.')
+    z = 12.
+    tl = t(z,args=args)
+    print(f'Time to redshift z = {z} is H0t = {tl/H0_inv} Gyr.')
+    z = 14.
+    tl = t(z,args=args)
+    print(f'Time to redshift z = {z} is H0t = {tl/H0_inv} Gyr.')
+    z = 16.
+    tl = t(z,args=args)
+    print(f'Time to redshift z = {z} is H0t = {tl/H0_inv} Gyr.')
+
+    tuni = t(1e12,args=args)
+    z = 2.0
+    tl = t(z,args=args)
+    print(f'Time to redshift z = {z} is t = {tuni-tl} Gyr.')
+    z = 2.0
+    tl = t(z,args=args)
+    print(f'Time to redshift z = {z} is t = {tuni-tl} Gyr.')
+    z = 4.
+    tl = t(z,args=args)
+    print(f'Time to redshift z = {z} is t = {tuni-tl} Gyr.')
+    z = 6.
+    tl = t(z,args=args)
+    print(f'Time to redshift z = {z} is t = {tuni-tl} Gyr.')
+    z = 8.
+    tl = t(z,args=args)
+    print(f'Time to redshift z = {z} is t = {tuni-tl} Gyr.')
+    z = 10.
+    tl = t(z,args=args)
+    print(f'Time to redshift z = {z} is t = {tuni-tl} Gyr.')
+    z = 12.
+    tl = t(z,args=args)
+    print(f'Time to redshift z = {z} is t = {tuni-tl} Gyr.')
+    z = 14.
+    tl = t(z,args=args)
+    print(f'Time to redshift z = {z} is t = {tuni-tl} Gyr.')
+    z = 16.
+    tl = t(z,args=args)
+    print(f'Time to redshift z = {z} is t = {tuni-tl} Gyr.')
+
+
     z = get_redshift_array(1000)
     a = 1./(1+z)
     tl = t(z,args=args)
     tlb = tl/H0_inv
 
+    np.savetxt("a_vs_H0t.txt",np.asarray([tlb,a]).T)
     plot_scale_factor_vs_look_back_time(tlb,a,args=args)
 
 if __name__=="__main__":
